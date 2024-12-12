@@ -1,0 +1,65 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
+from sklearn.naive_bayes import GaussianNB
+
+# Load dataset
+df = pd.read_csv("breast_cancer.csv")
+
+# Drop the last column if it is unnecessary (like ID or metadata)
+df = df.iloc[:, :-1]
+
+# Check the shape and first few rows
+print("Dataset shape:", df.shape)
+print(df.head())
+
+# Prepare features and target
+x = df.iloc[:, 2:].values  # Assuming features start from the 3rd column
+y = df['diagnosis'].values  # Target is the 'diagnosis' column
+
+# Display a preview of features and target
+print("Features preview:\n", x[:2])
+print("Target preview:\n", y[:5])
+
+# Split into training and testing sets
+x_train, x_test, y_train, y_test = train_test_split(x, y, test_size=0.2, random_state=500)
+
+# Check shapes of training and testing sets
+print("x_train shape:", x_train.shape)
+print("x_test shape:", x_test.shape)
+print("y_train shape:", y_train.shape)
+print("y_test shape:", y_test.shape)
+
+# Baseline model (predict 'B' for all)
+baseline_pred = ["B"] * len(y_train)
+baseline_accuracy = accuracy_score(y_train, baseline_pred)
+print("Baseline model accuracy:", baseline_accuracy)
+
+# Baseline confusion matrix
+print("Baseline Confusion Matrix:\n", confusion_matrix(y_train, baseline_pred))
+
+# Train Gaussian Naive Bayes model
+nb_model = GaussianNB()
+nb_model.fit(x_train, y_train)
+
+# Evaluate on training data
+train_accuracy = nb_model.score(x_train, y_train)
+print("Training Accuracy:", train_accuracy)
+
+# Evaluate on testing data
+test_accuracy = nb_model.score(x_test, y_test)
+print("Testing Accuracy:", test_accuracy)
+
+# Confusion matrix and classification report for training data
+print("Training Confusion Matrix:\n", confusion_matrix(y_train, nb_model.predict(x_train)))
+print("Training Classification Report:\n", classification_report(y_train, nb_model.predict(x_train)))
+
+# Confusion matrix and classification report for testing data
+print("Testing Confusion Matrix:\n", confusion_matrix(y_test, nb_model.predict(x_test)))
+print("Testing Classification Report:\n", classification_report(y_test, nb_model.predict(x_test)))
+
+# Final Precision/Recall/F1 Score for Testing Data
+test_report = classification_report(y_test, nb_model.predict(x_test), target_names=["B", "M"])
+print("Detailed Testing Report:\n", test_report)
