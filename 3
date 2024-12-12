@@ -1,0 +1,33 @@
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.metrics import accuracy_score, confusion_matrix, classification_report
+
+# Load the dataset
+df = pd.read_csv('breast_cancer.csv')
+
+# Drop the last column if it's unnecessary (e.g., ID column or unrelated data)
+df = df.iloc[:, :-1]
+
+# Separate features (X) and target (y)
+X = df.iloc[:,2 :] 
+y = df.iloc[:, 2]  
+# Split the dataset into training and testing sets
+x_train, x_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Instantiate and train the Decision Tree Classifier
+dt_classifier = DecisionTreeClassifier(random_state=42)
+dt_classifier.fit(x_train, y_train)
+
+# Predictions and probabilities
+predictions = dt_classifier.predict(x_test)
+prob_predictions = dt_classifier.predict_proba(x_test)
+
+# Evaluation
+print("Training Accuracy Score is: ", accuracy_score(y_train, dt_classifier.predict(x_train)))
+print("Training Confusion Matrix is: \n", confusion_matrix(y_train, dt_classifier.predict(x_train)))
+print("Testing Confusion Matrix is: \n", confusion_matrix(y_test, predictions))
+print("Classification Report: \n", classification_report(y_test, predictions))
+
